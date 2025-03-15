@@ -1,3 +1,8 @@
+#define _GNU_SOURCE
+#include <sched.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <signal.h>
 #include "uthread.h"
 
 int uthread_create(uthread *thread, void *(*func)(void *), void *arg){
@@ -9,7 +14,7 @@ int uthread_create(uthread *thread, void *(*func)(void *), void *arg){
 
 	pid_t tid = clone((int (*)(void *)) thread->func, thread->stack + 1024, SIGCHLD, thread->arg);
 	if(tid == -1){
-		free(stack);
+		free(thread->stack);
 		return -1;
 	}
 
