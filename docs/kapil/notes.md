@@ -8,78 +8,69 @@ many-one and many-many scheudling  of user threads on kernel threads.
 - thread_create() ;		// provide option to use a desired mapping.
 - thread_join() ;		// parent waits for thread
 - thread_exit();		// thread exit
-thread_lock();			// a spinlock
-thread_unlock();		// spin-unlock
-thread_cancel() ;		// cancel thread
-thread_mutex_lock();	// a mutex sleep-lock
-thread_mutex_unlock();
+- thread_lock();			// a spinlock
+- thread_unlock();		// spin-unlock
+- thread_cancel() ;		// cancel thread
+- thread_mutex_lock();	// a mutex sleep-lock
+- thread_mutex_unlock();
 - thread_kill();			// handle SIGs  - TERM, STOP, CONT, KILL
 
-# Note: you need to use the SIGALRM/SIGVTALRM signals to do scheduling. 
-# Learn setjmp and longjmp in C library, you may also use the ucontext library.
-
-Your testing should cover all possible ways of creating threads and race conditions.
+# Imp Notes
+- Use the SIGALRM/SIGVTALRM signals to do scheduling. 
+- Learn setjmp and longjmp in C library, you may also use the ucontext library.
+- Your testing should cover all possible ways of creating threads and race conditions.
 
 # Marking Scheme
-Many-one: 10 Marks, Many-Many: 10 Marks.
-Automated Testing code with coverage of all sposibilities: 10 marks
-synchronization: 10 marks
-signal handling: 10 marks
+- Many-one: 10 Marks, Many-Many: 10 Marks.
+- Automated Testing code with coverage of all sposibilities: 10 marks
+- synchronization: 10 marks
+- signal handling: 10 marks
 
------------------------------- ROUGH NOTES ---------------------------------------------------- 
 
-Userland: threading libraries
--------
+# Userland: threading libraries
+
 - Read textbook chapter on threads. 
 - Read about clone() system call.
 	Try clone() in all possible ways.
 	Read about signals, SIGALRM, SIGVTALRM, play with them. 
 
-[
-check diff signals and their behaviour
-play with args (pass by reference, value)
-flags [CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_THREAD, CLONE_PARENT_SETTID/CHLD, CLONE_SETTLS]
-]
+- Write pthread library programs for matrix multiplication, factorial. 
+- Get some clarity about flow of code, from application->library->clone and return. 
+- Start designing 1-1 implementation by defining user-land functiosn on lines of pthreads.
+- Finish 1-1.
+- Read about setcontext(), getcontext() or alternatively about setjmp, longjmp. 
+- Think of how to switch-context in user-land combining signals and context code.
+- Implement many-1. 
+- Implement many-many.
 
-Write pthread library programs for matrix multiplication, factorial. 
-Get some clarity about flow of code, from application->library->clone and return. 
-Start designing 1-1 implementation by defining user-land functiosn on lines of pthreads.
-Finish 1-1.
-Read about setcontext(), getcontext() or alternatively about setjmp, longjmp. 
-Think of how to switch-context in user-land combining signals and context code.
-Implement many-1. 
-Implement many-many.
 
------------------------------- ROUGH NOTES ---------------------------------------------------- 
+# Userland threads
+----------------
 
-Userland threads
-----
-
-Implement the same functions as provided by pthreads.
+- Implement the same functions as provided by pthreads. 
 create, join, kill 
 
-Different implementations: same function prototype, but different code.
+- Different implementations: same function prototype, but different code.
 
-one-one/mythread.h one-one/mythread.c 
-	mythread_create(tid_t, funcptr_t f, arg_t a) 
-many-one/mythread.h many-one/mythread.c 
-	mythread_create(tid_t, funcptr_t f, arg_t a) 
-in both .c files you should have functions with SAME prototype! 
+- one-one/mythread.h one-one/mythread.c : mythread_create(tid_t, funcptr_t f, arg_t a) 
+- many-one/mythread.h many-one/mythread.c :	mythread_create(tid_t, funcptr_t f, arg_t a) 
+- in both .c files you should have functions with SAME prototype! 
 
-If I write a program using your library, I should be able to link it with any implementation without changing my code!
+- If I write a program using your library, I should be able to link it with any implementation without changing my code!
 
-mycode.c
+- mycode.c
+```
 #include "mythread.h" 
 int main() {
 	mythread_create(t, f, x);
 }
 cc -I one-one mycode.c 
 cc -I many-one  mycode.c 
+```
 
---
 # Implemetation
 # one-one
-
+```
 struct thread {
 	int tid;
 	stack *stack;
@@ -96,9 +87,10 @@ mythread_join(int *tid) {
 	find the thread using tid in array/LL
 	wait;
 }
+```
 
---
 # many-one 
+```
 struct thread {
 	int tid;
 	stack *stack;
@@ -128,8 +120,10 @@ scheduler() {
 	// use the makecontext, getcontext, setcontext()
 	// before anything, try these functions first! 
 }
+```
 --------------
 # many-many
+```
 struct thread {
 	int tid;
 	stack *stack;
@@ -179,4 +173,5 @@ myprogram.c
 mythread_create(....f,... ) // added to the queue; 
 mythread_create(....g, ..)	// clone()
 mythread_create(....h, ..) // does not call a clone 
+```
 
