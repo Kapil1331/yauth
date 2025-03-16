@@ -12,7 +12,7 @@ int cloneFunc(void *arg){
 	printf("C:the pid of child is : %d\n", getpid());
 	register void *sp asm ("sp");
 	printf("C:%p\n", sp);
-	return 69;
+	return 10;
 }
 
 int main(int argc, char *argv[]){
