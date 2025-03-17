@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include "uthread.h"
 
-#define STACK_SIZE 1024
+#define STACK_SIZE (16 *1024)
 
-int uthread_create(uthread *thread, void *(*func)(void *), void *arg){
+int uthread_create(uthread *thread, int (*func)(void *), void *arg){
 
 	thread->stack = malloc(STACK_SIZE);
 	void *stack_top = thread->stack + STACK_SIZE;
@@ -18,7 +18,7 @@ int uthread_create(uthread *thread, void *(*func)(void *), void *arg){
 	thread->func = func;
 	thread->arg = arg;
 
-	pid_t tid = clone((int (*)(void *)) thread->func, stack_top, SIGCHLD, thread->arg);
+	pid_t tid = clone(thread->func, stack_top, SIGCHLD, thread->arg);
 	if(tid == -1){
 		perror("clone failed");
 		free(thread->stack);
