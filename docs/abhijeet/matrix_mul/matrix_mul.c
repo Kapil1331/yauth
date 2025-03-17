@@ -1,6 +1,8 @@
+#define _GNU_SOURCE
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 /*
  - read matrix from file --- function
@@ -86,7 +88,7 @@ void *multiply_row(void *arg){
     }
 
     //checking parallelization
-    printf("Fin : row - %d\n", data->rowC);
+    printf("Fin Pid : %d Tid : %d: row - %d\n", getpid(), gettid(), data->rowC);
 
     return NULL;
 }
@@ -145,7 +147,7 @@ int main(){
 
     int **A = read_matrix(FILE1, &rowsA, &colsA);
     int **B = read_matrix(FILE2, &rowsB, &colsB);
-
+	printf("%d, %d\n",getpid(), gettid());
     struct matrix_data A1;
     A1.matrix = A;
     A1.rows = rowsA;
