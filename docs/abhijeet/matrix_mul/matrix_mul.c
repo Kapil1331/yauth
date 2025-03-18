@@ -88,7 +88,7 @@ void *multiply_row(void *arg){
     }
 
     //checking parallelization
-    printf("Fin Pid : %d Tid : %d: row - %d\n", getpid(), gettid(), data->rowC);
+    printf("Fin Pid[getpid()] : %d | Tid[gettiid()] : %d | PosixTid[pthread_self] : %lu | row : %d\n", getpid(), gettid(), pthread_self(), data->rowC);
 
     return NULL;
 }
